@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class CharacterControl : MonoBehaviour
 {
-    // Some attributes first
     private Animator animator_component;
     //Running
     private bool runn_ng;
@@ -23,105 +22,124 @@ public class CharacterControl : MonoBehaviour
     //WalkingBackwards
     private bool walk_ngb;
     // Rotation speed
-    private float rotationSpeed = 0.9f;
+    private int rotationSpeed = 3;
     //Just a help variable
     private float rotationMagnitude;
     //Translation speed
-    private float tSpeed = 0.00999f;
+    private int tSpeed = 1;
     //Rotation
     private Vector3 rotationVector;
+    // The rigidbody
+    private Rigidbody rb;
     // Start is called before the first frame update
     void Start()
     {
         //I get access to the animation controller
         animator_component = gameObject.GetComponent<Animator>();
+        // I get access to the rigidbody
+        rb = GetComponent<Rigidbody>();
     }
-    // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        //In case was running before
-        tSpeed = 0.00999f;
+//In case was running before
+        tSpeed = 1;
         //If pressing f
         if (Input.GetKeyDown(KeyCode.F))
         {
             danc_ng = true;
+            Debug.Log("Presionando F");
         }
         //If not pressing A
         if (Input.GetKeyUp(KeyCode.F))
         {
             danc_ng = false;
+            Debug.Log("No presionando F");
         }
         //If pressing w
         if (Input.GetKeyDown(KeyCode.W))
         {
             walk_ngf = true;
+            Debug.Log("Presionando W");
         }
         //If not pressing w
         if (Input.GetKeyUp(KeyCode.W))
         {
             walk_ngf = false;
+            Debug.Log("No presionando W");
         }
         //If pressing s
         if (Input.GetKeyDown(KeyCode.S))
         {
             walk_ngb = true;
+            Debug.Log("Presionando S");
         }
         //If not pressing s
         if (Input.GetKeyUp(KeyCode.S))
         {
             walk_ngb = false;
+            Debug.Log("No presionando S");
         }
         //If pressing d
         if (Input.GetKeyDown(KeyCode.D))
         {
             rotater = true;
+            Debug.Log("Presionando D");
         }
         //If not pressing d
         if (Input.GetKeyUp(KeyCode.D))
         {
             rotater = false;
+            Debug.Log("No presionando D");
         }
         //If pressing tab
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             crou_h = true;
+            Debug.Log("Presionando tab");
         }
         //If not pressing tab
         if (Input.GetKeyUp(KeyCode.Tab))
         {
             crou_h = false;
+            Debug.Log("No presionando tab");
         }
         //If pressing A
         if (Input.GetKeyDown(KeyCode.A))
         {
             rotatel = true;
+            Debug.Log("Presionando A");
         }
         //If not pressing A
         if (Input.GetKeyUp(KeyCode.A))
         {
             rotatel = false;
+            Debug.Log("No presionando A");
         }
         //If pressing shift
         if ((Input.GetKeyDown(KeyCode.LeftShift)) || (Input.GetKeyDown(KeyCode.RightShift)))
         {
             runn_ng = true;
+            Debug.Log("Presionando Shift");
         }
         //If not pressing shift
-        if ((Input.GetKeyUp(KeyCode.LeftShift)) && (Input.GetKeyUp(KeyCode.RightShift)))
+        if ((Input.GetKeyUp(KeyCode.LeftShift)) || (Input.GetKeyUp(KeyCode.RightShift)))
         {
             runn_ng = false;
+            Debug.Log("No presionando Shift");
         }
         //If pressing space
         if (Input.GetKeyDown(KeyCode.Space))
         {
             jum_ = true;
+            Debug.Log("Presionando space");
         }
         //If not pressing space
         if (Input.GetKeyUp(KeyCode.Space))
         {
             jum_ = false;
+            Debug.Log("No presionando space");
         }
-        //Update values of animator
+        //Update values
         if (walk_ngf)
             animator_component.SetBool("walking", true);
         else if (!walk_ngf)
@@ -146,13 +164,6 @@ public class CharacterControl : MonoBehaviour
             animator_component.SetBool("running", true);
         else if (!runn_ng) 
             animator_component.SetBool("running", false);
-        if (walk_ngb)
-            tSpeed *=-1;
-        if (runn_ng)
-            tSpeed *= 1.8f;
-        // If is walking
-        if (walk_ngf || walk_ngb)
-            this.transform.Translate(Vector3.forward * tSpeed, Space.Self);
         //
         if (rotatel || rotater)
         {
@@ -164,11 +175,22 @@ public class CharacterControl : MonoBehaviour
             if (rotatel && walk_ngf)
                 this.transform.Rotate(Vector3.up * (rotationMagnitude*-1), Space.Self);
             else if (rotater && walk_ngf)
-                this.transform.Rotate(rotationVector, Space.Self);
-            else if (rotatel && walk_ngb)
-                this.transform.Rotate(rotationVector, Space.Self);
-            else if (rotater && walk_ngb)
-                this.transform.Rotate(Vector3.up *(rotationMagnitude*-1), Space.Self);
-        }
-    } 
+                this.transform.Rotate(rotationVector, Space.Self);	
+            if (walk_ngb)
+            {
+		tSpeed *=-1;
+		if (rotatel)
+                    this.transform.Rotate(rotationVector, Space.Self);
+                if (rotater)
+                    this.transform.Rotate(Vector3.up *(rotationMagnitude*-1), Space.Self);
+            }
+        }   
+	if (walk_ngb)
+            tSpeed *= -1;
+        if (runn_ng && !walk_ngb)
+            tSpeed *= 3;
+        // If is walking
+        if (walk_ngf || walk_ngb)
+            rb.MovePosition(this.transform.position + (transform.forward * tSpeed * Time.fixedDeltaTime));
+    }
 }
