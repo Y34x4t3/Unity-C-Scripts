@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class CharacterControl : MonoBehaviour
 {
+    // Some attributes first
     private Animator animator_component;
     //Running
     private bool runn_ng;
@@ -120,7 +121,7 @@ public class CharacterControl : MonoBehaviour
         {
             jum_ = false;
         }
-        //Update values
+        //Update values of animator
         if (walk_ngf)
             animator_component.SetBool("walking", true);
         else if (!walk_ngf)
